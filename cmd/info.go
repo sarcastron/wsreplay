@@ -1,12 +1,15 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"fmt"
+	"os"
 
+	appConfig "wsreplay/pkg/config"
+
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -14,10 +17,18 @@ import (
 var infoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "Get info about the app configuration.",
-	Long: `Displays info about the applications configuration if one is detected.`,
+	Long:  `Displays info about the applications configuration if one is detected.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO implement this so that we can actually read from a config.yaml file.
-		fmt.Println("No configuration detected.")
+		config, err := appConfig.LoadConfig(cfgFile)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		info := color.New(color.FgGreen).SprintFunc()
+
+		fmt.Printf("Target: %s\n", info(config.Target))
+		fmt.Printf("Duration: %s\n", info(config.Duration))
 	},
 }
 
