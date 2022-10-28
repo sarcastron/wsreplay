@@ -6,10 +6,11 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	appConfig "wsreplay/pkg/config"
 	"wsreplay/pkg/output"
-	"wsreplay/pkg/wsrecorder"
+	"wsreplay/pkg/tapedeck"
 
 	"github.com/spf13/cobra"
 )
@@ -17,15 +18,9 @@ import (
 // recordCmd represents the record command
 var recordCmd = &cobra.Command{
 	Use:   "record",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Record a websocket session.",
+	Long:  `Records a websocket session and saves the session to serialized gob files.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("record called")
 		config, err := appConfig.GetConfig(cfgFile)
 		if err != nil {
 			fmt.Println(err)
@@ -33,7 +28,7 @@ to quickly create a Cobra application.`,
 		}
 
 		fmt.Printf("Recording: %s for %s seconds.\n", output.Info(config.Target), output.Info(config.Duration))
-		wsrecorder.Record(config.Target)
+		tapedeck.Record(config.Target, time.Duration(config.Duration)*time.Second)
 	},
 }
 

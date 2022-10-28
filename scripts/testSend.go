@@ -74,7 +74,7 @@ func sendMessages(ticket string) {
 		pm := RandPriceMovement()
 		newPrice = newPrice + pm
 		log.Printf("%d/%d %s -> %f (%f)\n", x+1, iterations, ticker, newPrice, pm)
-		time.Sleep(1 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 
 		message := TradeMessage{ticker, newPrice}
 		if err := c.WriteJSON(message); err != nil {
