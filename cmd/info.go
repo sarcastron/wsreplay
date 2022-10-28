@@ -8,8 +8,8 @@ import (
 	"os"
 
 	appConfig "wsreplay/pkg/config"
+	"wsreplay/pkg/output"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -19,22 +19,19 @@ var infoCmd = &cobra.Command{
 	Short: "Get info about the app configuration.",
 	Long:  `Displays info about the applications configuration if one is detected.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := appConfig.LoadConfig(cfgFile)
+		config, err := appConfig.GetConfig(cfgFile)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		info := color.New(color.FgGreen).SprintFunc()
-
-		fmt.Printf("Target: %s\n", info(config.Target))
-		fmt.Printf("Duration: %s\n", info(config.Duration))
+		fmt.Printf("Target: %s\n", output.Info(config.Target))
+		fmt.Printf("Duration: %s\n", output.Info(config.Duration))
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(infoCmd)
-
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

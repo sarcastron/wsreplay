@@ -10,15 +10,15 @@ type Config struct {
 }
 
 var defaultConfig Config = Config{
-	"localhost:8000",
+	"ws://localhost:8000/",
 	0,
 }
 
 var vp *viper.Viper
+var config Config
 
-func LoadConfig(cfgFile string) (Config, error) {
+func loadConfig(cfgFile string) (Config, error) {
 	vp = viper.New()
-	var config Config
 
 	if cfgFile != "" {
 		// Use config file from the flag.
@@ -43,4 +43,12 @@ func LoadConfig(cfgFile string) (Config, error) {
 	}
 
 	return config, nil
+}
+
+func GetConfig(cfgFile string) (Config, error) {
+	var err error = nil
+	if config.Target == "" {
+		config, err = loadConfig(cfgFile)
+	}
+	return config, err
 }
