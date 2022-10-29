@@ -28,7 +28,9 @@ var recordCmd = &cobra.Command{
 		}
 
 		fmt.Printf("Recording: %s for %s seconds.\n", output.Info(config.Target), output.Info(config.Duration))
-		tapedeck.Record(config.Target, time.Duration(config.Duration)*time.Second)
+		var messages []tapedeck.Message
+		tapedeck.Record(config.Target, time.Duration(config.Duration)*time.Second, &messages)
+		fmt.Printf("%d message(s) recorded.\n", len(messages))
 	},
 }
 

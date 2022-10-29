@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func Record(uri string, duration time.Duration) {
+func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -27,7 +27,6 @@ func Record(uri string, duration time.Duration) {
 	defer c.Close()
 
 	done := make(chan struct{})
-	var messages []Message
 
 	// Naming this to signal intent
 	readMessageLoop := func() {
@@ -40,7 +39,7 @@ func Record(uri string, duration time.Duration) {
 				return
 			}
 			ts := time.Since(startTime)
-			messages = append(messages, Message{ts, string(message)})
+			*messages = append(*messages, Message{ts, string(message)})
 			i += 1
 			fmt.Printf("%v T: %v - %s", i, time.Since(startTime), message)
 		}
@@ -61,6 +60,7 @@ func Record(uri string, duration time.Duration) {
 		}
 		select {
 		case <-done:
+			println("Expected done.")
 		case <-time.After(time.Second):
 		}
 	}
@@ -68,19 +68,19 @@ func Record(uri string, duration time.Duration) {
 	for {
 		select {
 		case <-done:
-			fmt.Println(" - Done called.")
-			return
+			fmt.Println(" - unexpected Done.")
+			return *messages
 		case t := <-ticker.C:
 			// Check for duration to expire
 			if t.After(endTime) {
 				fmt.Printf("\nDuration of %v has elapsed. Shutting down...\n", output.Notice(duration))
 				gracefulShutdown()
-				return
+				return *messages
 			}
 		case <-interrupt:
 			fmt.Println(" Interrupt signal detected. Shutting down...")
 			gracefulShutdown()
-			return
+			return *messages
 		}
 
 	}
