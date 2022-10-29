@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -31,6 +32,10 @@ var recordCmd = &cobra.Command{
 		var messages []tapedeck.Message
 		tapedeck.Record(config.Target, time.Duration(config.Duration)*time.Second, &messages)
 		fmt.Printf("%d message(s) recorded.\n", len(messages))
+		err = tapedeck.WriteTape(config.OutputTapeFile, &messages)
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
