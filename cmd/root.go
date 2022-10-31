@@ -18,7 +18,7 @@ var RootCmd = &cobra.Command{
 	Use:   "wsreplay",
 	Short: "Record and playback websocket traffic.",
 	Long: `A tool for websocket development that can record and playback websocket traffic.
-Will save traffic to a file for analysis and playback.`,
+Will save traffic to a file for playback.`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -38,5 +38,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

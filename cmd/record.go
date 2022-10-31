@@ -20,7 +20,7 @@ import (
 var recordCmd = &cobra.Command{
 	Use:   "record",
 	Short: "Record a websocket session.",
-	Long:  `Records a websocket session and saves the session to serialized gob files.`,
+	Long:  `Records a websocket session and saves the session to a serialized gob file.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := appConfig.GetConfig(cfgFile)
 		if err != nil {

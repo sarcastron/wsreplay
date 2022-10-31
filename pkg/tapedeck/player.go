@@ -42,9 +42,9 @@ func Playback(messages *[]Message, wsConn *websocket.Conn) error {
 		case <-time.After(time.Millisecond / 2):
 			// Check for duration to expire
 			ts := time.Since(startTime)
-			fmt.Printf("%v | %v - %d\r", (*messages)[i].Tick, ts, i)
+			fmt.Printf("|>: %s\r", ts)
 			if ts >= (*messages)[i].Tick {
-				fmt.Println(" -- ", ts, (*messages)[i].Tick, "--")
+				fmt.Printf("#%d - %s", i+1, string((*messages)[i].Content))
 				// TODO Allow recording binary ws messages as well.
 				err := wsConn.WriteMessage(websocket.TextMessage, (*messages)[i].Content)
 				if err != nil {

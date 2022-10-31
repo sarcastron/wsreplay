@@ -25,8 +25,14 @@ var infoCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Printf("Target: %s\n", output.Info(config.Target))
-		fmt.Printf("Duration: %s\n", output.Info(config.Duration))
+		fmt.Print("Recorder settings\n")
+		fmt.Printf(" - Target: %s\n", output.Info(config.Target))
+		fmt.Printf(" - Duration: %s\n", output.Info(config.Duration))
+		fmt.Printf(" - Output File: %s\n", output.Info(config.OutputTapeFile))
+
+		fmt.Print("\nPlayback settings\n")
+		fmt.Printf(" - Input File: %s\n", output.Info(config.OutputTapeFile))
+		fmt.Printf(" - Server Address: %s\n", output.Info(config.ServerAddr))
 	},
 }
 

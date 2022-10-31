@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	appConfig "wsreplay/pkg/config"
+	"wsreplay/pkg/output"
 	"wsreplay/pkg/tapedeck"
 	"wsreplay/pkg/wsserver"
 )
@@ -28,6 +29,14 @@ var playbackCmd = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
+		// Determine playback file
+		if playbackFile == "" {
+			playbackFile = config.OutputTapeFile
+		}
+
+		fmt.Printf("Loading %s\n", output.Notice(config.OutputTapeFile))
+
 		var messages []tapedeck.Message
 		err = tapedeck.ReadTape(playbackFile, &messages)
 		if err != nil {
