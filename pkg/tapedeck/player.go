@@ -45,9 +45,8 @@ func Playback(messages *[]Message, wsConn *websocket.Conn) error {
 			fmt.Printf("%v | %v - %d\r", (*messages)[i].Tick, ts, i)
 			if ts >= (*messages)[i].Tick {
 				fmt.Println(" -- ", ts, (*messages)[i].Tick, "--")
-				// TODO keep content in bytes.
 				// TODO Allow recording binary ws messages as well.
-				err := wsConn.WriteMessage(websocket.TextMessage, []byte((*messages)[i].Content))
+				err := wsConn.WriteMessage(websocket.TextMessage, (*messages)[i].Content)
 				if err != nil {
 					log.Println("write:", output.Danger(err))
 				}

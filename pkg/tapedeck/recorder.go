@@ -40,7 +40,7 @@ func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 				return
 			}
 			ts := time.Since(startTime)
-			*messages = append(*messages, Message{ts, string(message)})
+			*messages = append(*messages, Message{ts, message})
 			i += 1
 			fmt.Printf("%v T: %v - %s", i, time.Since(startTime), message)
 		}

@@ -9,7 +9,7 @@ import (
 
 var upgrader = websocket.Upgrader{}
 
-func makeWsConnectionHandler(wsChan chan *websocket.Conn) func(w http.ResponseWriter, r *http.Request) {
+func StartServer(addr string, wsChan chan *websocket.Conn) {
 	wsConnectionHandler := func(w http.ResponseWriter, r *http.Request) {
 		// TODO only allow specific origins
 		upgrader.CheckOrigin = func(r *http.Request) bool {
@@ -22,11 +22,7 @@ func makeWsConnectionHandler(wsChan chan *websocket.Conn) func(w http.ResponseWr
 		}
 		wsChan <- ws
 	}
-	return wsConnectionHandler
-}
-
-func StartServer(addr string, wsChan chan *websocket.Conn) {
-	http.HandleFunc("/", makeWsConnectionHandler(wsChan))
+	http.HandleFunc("/", wsConnectionHandler)
 	// Wrap this in a go routine so it doesn't block.
 	go func() {
 		log.Fatal(http.ListenAndServe(addr, nil))

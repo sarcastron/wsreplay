@@ -19,9 +19,6 @@ var rootCmd = &cobra.Command{
 	Short: "Record and playback websocket traffic.",
 	Long: `A tool for websocket development that can record and playback websocket traffic.
 Will save traffic to a file for analysis and playback.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
