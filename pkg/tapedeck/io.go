@@ -3,7 +3,6 @@ package tapedeck
 import (
 	"encoding/gob"
 	"errors"
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -12,7 +11,6 @@ import (
 // Tape files are just gob files but this analogy ain't tired yet
 func WriteTape(filePath string, messages *[]Message) error {
 	baseDir := filepath.Dir(filePath)
-	fmt.Println(baseDir)
 	exists, err := exists(baseDir)
 	if err != nil {
 		return err
