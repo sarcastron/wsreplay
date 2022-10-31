@@ -1,2 +1,4 @@
 target: ws://localhost:8080
 duration: 300
+outputTapeFile: './tapes/session_20221031.gob'
+ServerAddr: ':8001'

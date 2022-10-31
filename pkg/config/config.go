@@ -8,6 +8,7 @@ type Config struct {
 	Target         string `mapstructure:"target"`
 	Duration       int    `mapstructure:"duration"`
 	OutputTapeFile string `mapstructure:"outputTapeFile"`
+	ServerAddr     string `mapstructure:"serverAddr"`
 }
 
 var vp *viper.Viper
@@ -28,6 +29,7 @@ func loadConfig(cfgFile string) (Config, error) {
 	vp.SetDefault("target", "ws://localhost:8000/")
 	vp.SetDefault("duration", 0)
 	vp.SetDefault("outputTapeFile", nil)
+	vp.SetDefault("ServerAddr", ":8001")
 
 	err := vp.ReadInConfig()
 	if err != nil {

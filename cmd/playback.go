@@ -7,9 +7,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gorilla/websocket"
 	"github.com/spf13/cobra"
 
+	appConfig "wsreplay/pkg/config"
 	"wsreplay/pkg/tapedeck"
+	"wsreplay/pkg/wsserver"
 )
 
 var playbackFile string
@@ -20,14 +23,32 @@ var playbackCmd = &cobra.Command{
 	Short: "Playback a recorded websocket session.",
 	Long:  `Will playback a recorded session. Playback will start as soon as the client connects to it unless the --immediate flag is set.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var messages []tapedeck.Message
-		err := tapedeck.ReadTape(playbackFile, &messages)
+		config, err := appConfig.GetConfig(cfgFile)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		tapedeck.Playback(&messages)
-		// fmt.Println(messages)
+		var messages []tapedeck.Message
+		err = tapedeck.ReadTape(playbackFile, &messages)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		if len(messages) < 1 {
+			fmt.Println(" -- No messages to playback.")
+			os.Exit(0)
+		}
+		// This channel will be used to pass back the websocket connection ref
+		wsChan := make(chan *websocket.Conn)
+		// Start the http server
+		wsserver.StartServer(config.ServerAddr, wsChan)
+		fmt.Println("Server is listening on ", config.ServerAddr)
+		fmt.Print("Waiting for a client to connect...")
+		wsConn := <-wsChan
+		defer wsConn.Close()
+		fmt.Println("connected.")
+		tapedeck.Playback(&messages, wsConn)
 	},
 }
 
