@@ -1,6 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2022 Adam Plante <toomanyadams@gmail.com>
 */
 package main
 

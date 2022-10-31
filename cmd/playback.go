@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 Adam Plante <toomanyadams@gmail.com>
 */
 package cmd
 
@@ -53,7 +53,7 @@ var playbackCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(playbackCmd)
+	RootCmd.AddCommand(playbackCmd)
 
 	// Here you will define your flags and configuration settings.
 

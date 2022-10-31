@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 Adam Plante <toomanyadams@gmail.com>
 */
 package cmd
 
@@ -31,7 +31,7 @@ var infoCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(infoCmd)
+	RootCmd.AddCommand(infoCmd)
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
