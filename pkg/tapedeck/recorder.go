@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// TODO return an error and let the command handle the various error states
 func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 
 	interrupt := make(chan os.Signal, 1)
@@ -82,6 +83,5 @@ func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 			gracefulShutdown()
 			return *messages
 		}
-
 	}
 }
