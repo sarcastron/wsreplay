@@ -5,14 +5,13 @@ Record and playback websocket traffic.
 ### Synopsis
 
 A tool for websocket development that can record and playback websocket traffic.
-Will save traffic to a file for analysis and playback.
+Will save traffic to a file for playback.
 
 ### Options
 
 ```
-  -c, --config string   config file (default is ./config.yaml) (default "./config.yaml")
+  -c, --config string   config file to use. (default "./config.yaml")
   -h, --help            help for wsreplay
-  -t, --toggle          Help message for toggle
 ```
 
 ### SEE ALSO

@@ -4,7 +4,7 @@ Playback a recorded websocket session.
 
 ### Synopsis
 
-Will playback a recorded session. Playback will start as soon as the client connects to it unless the --immediate flag is set.
+Will playback a recorded session. Playback will start as soon as the client connects to it.
 
 ```
 wsreplay playback [flags]
@@ -20,7 +20,7 @@ wsreplay playback [flags]
 ### Options inherited from parent commands
 
 ```
-  -c, --config string   config file (default is ./config.yaml) (default "./config.yaml")
+  -c, --config string   config file to use. (default "./config.yaml")
 ```
 
 ### SEE ALSO

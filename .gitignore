@@ -3,3 +3,5 @@ tapes
 .env
 config.yaml
 .DS_Store
+
+wsreplay

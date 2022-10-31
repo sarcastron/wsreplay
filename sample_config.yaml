@@ -1,4 +1,6 @@
+# Recorder settings
 target: ws://localhost:8080
 duration: 300
 outputTapeFile: './tapes/session_20221031.gob'
-ServerAddr: ':8001'
+# Playback setting
+ServerAddr: '0.0.0.0:8001'

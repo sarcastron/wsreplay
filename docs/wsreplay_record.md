@@ -4,7 +4,7 @@ Record a websocket session.
 
 ### Synopsis
 
-Records a websocket session and saves the session to serialized gob files.
+Records a websocket session and saves the session to a serialized gob file.
 
 ```
 wsreplay record [flags]
@@ -19,7 +19,7 @@ wsreplay record [flags]
 ### Options inherited from parent commands
 
 ```
-  -c, --config string   config file (default is ./config.yaml) (default "./config.yaml")
+  -c, --config string   config file to use. (default "./config.yaml")
 ```
 
 ### SEE ALSO
