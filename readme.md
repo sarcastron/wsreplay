@@ -70,3 +70,4 @@ For more info see the [generated docs](./docs/wsreplay.md).
 - Duration of `0` for playback until interrupt.
 - Output as library for import into other projects.
 - Authentication handling.
+- Replay mode

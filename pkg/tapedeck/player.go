@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"wsreplay/pkg/output"
@@ -42,9 +43,9 @@ func Playback(messages *[]Message, wsConn *websocket.Conn) error {
 		case <-time.After(time.Millisecond / 2):
 			// Check for duration to expire
 			ts := time.Since(startTime)
-			fmt.Printf(" |>: %s          \r", ts)
+			fmt.Printf(" |> %s          \r", ts)
 			if ts >= (*messages)[i].Tick {
-				fmt.Printf("#%d - %s", i+1, string((*messages)[i].Content))
+				fmt.Printf("#%d - %s                 \n", i+1, strings.TrimSuffix(string((*messages)[i].Content), "\n"))
 				// TODO Allow recording binary ws messages as well.
 				err := wsConn.WriteMessage(websocket.TextMessage, (*messages)[i].Content)
 				if err != nil {
