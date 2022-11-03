@@ -4,42 +4,42 @@ Record and playback a websocket session. Playback will attempt to mimic the mess
 
 ## Configuration
 
-Configuration is done with yaml files. In the future all options will be configurable with flags. The following configuration will record any messages sent to the `target` for `300` seconds. When the duration has elapsed the messages will be written to the path and file noted in `outputTapeFile`.
+Configuration is done with yaml files or CLI flags. The following configuration will record any messages sent to the `target` for `300` seconds. When the duration has elapsed the messages will be written to the path and file noted in `file`.
 
 ```yaml
 # Recorder settings
 target: ws://localhost:8080
 # duration in seconds
 duration: 300
-outputTapeFile: './tapes/session_20221031.gob'
+file: './tapes/session_20221031.gob'
 # Playback setting
-ServerAddr: '0.0.0.0:8001'
+serverAddr: '0.0.0.0:8001'
 ```
 
 ## Recording
 
-To record a session, run the `wsreplay record` command with a path to the configuration file.
+To record a session, run the `wsreplay record` command with a path to the configuration file or with flags. Flags are [documented here](./docs/wsreplay_record.md).
 
 ```sh
-# Uses default path of configuration file: ./config.yaml
-wsreplay record
-
 # Uses the configuration file provided.
 wsreplay record --config ./path/to/config.yaml
+
+# target, duration, and output file are set with flags
+wsreplay record -t ws://localhost:8001 -d 15 -f ./tapes/session1.gob
 ```
 
 Recording will begin as soon as the connection is made. When the duration has elapsed or `ctrl-c` interrupt is triggered, the file will be written to storage.
 
 ## Playback
 
-To playback a session run the `wsreplay playback` command. If provided, an input file path will be used. Otherwise the configuration file's `outputTapeFile` value will be used.
+To playback a session run the `wsreplay playback` command with a config flag or specific flags. Flags are [documented here](./docs/wsreplay_playback.md).
 
 ```sh
-# Uses the configuration file's outputTapeFile value as playback file.
+# Uses the configuration's file value as playback file.
 wsreplay playback
 
-# Uses the file at provided path
-wsreplay playback -f ./tapes/derp2.gob
+# Uses the file at provided path and serves on port 8001
+wsreplay playback -f ./tapes/session2.gob -s 0.0.0.0:8001
 ```
 
 ## Configuration Info
