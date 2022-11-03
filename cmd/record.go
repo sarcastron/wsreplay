@@ -16,23 +16,43 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var target *string
+var duration *int
+var outputFile *string
+
 // recordCmd represents the record command
 var recordCmd = &cobra.Command{
 	Use:   "record",
 	Short: "Record a websocket session.",
 	Long:  `Records a websocket session and saves the session to a serialized gob file.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := appConfig.GetConfig(cfgFile)
+		config, err := appConfig.LoadConfig(&cfgFile)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		fmt.Printf("Recording: %s for %s seconds.\n", output.Info(config.Target), output.Info(config.Duration))
+		if config == nil {
+			config, err = appConfig.NewRecordConfig(
+				target,
+				*duration,
+				outputFile,
+			)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		}
+
+		timeSpan := ""
+		if *duration > 0 {
+			timeSpan = fmt.Sprintf(" for %s seconds or", output.Info(config.Duration))
+		}
+		fmt.Printf("Recording: %s%s until interrupt (%s)\n", output.Info(config.Target), timeSpan, output.Notice("ctrl-c"))
 		var messages []tapedeck.Message
 		tapedeck.Record(config.Target, time.Duration(config.Duration)*time.Second, &messages)
 		fmt.Printf("%d message(s) recorded.\n", len(messages))
-		err = tapedeck.WriteTape(config.OutputTapeFile, &messages)
+		err = tapedeck.WriteTape(config.File, &messages)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -42,13 +62,7 @@ var recordCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(recordCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// recordCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// recordCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	target = recordCmd.Flags().StringP("target", "t", "", "Websocket connection to record.")
+	duration = recordCmd.Flags().IntP("duration", "d", 0, "Number of seconds to record. 0 seconds will run until interrupted (ctrl-c).")
+	outputFile = recordCmd.Flags().StringP("file", "f", "", "File to save the recorded data to.")
 }

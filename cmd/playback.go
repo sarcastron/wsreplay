@@ -16,7 +16,10 @@ import (
 	"wsreplay/pkg/wsserver"
 )
 
-var playbackFile string
+var (
+	file       *string
+	serverAddr *string
+)
 
 // playbackCmd represents the playback command
 var playbackCmd = &cobra.Command{
@@ -24,21 +27,27 @@ var playbackCmd = &cobra.Command{
 	Short: "Playback a recorded websocket session.",
 	Long:  `Will playback a recorded session. Playback will start as soon as the client connects to it.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := appConfig.GetConfig(cfgFile)
+		config, err := appConfig.LoadConfig(&cfgFile)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		// Determine playback file
-		if playbackFile == "" {
-			playbackFile = config.OutputTapeFile
+		if config == nil {
+			config, err = appConfig.NewPlaybackConfig(
+				file,
+				serverAddr,
+			)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		}
 
-		fmt.Printf("Loading %s\n", output.Notice(config.OutputTapeFile))
+		fmt.Printf("Loading %s\n", output.Notice(config.File))
 
 		var messages []tapedeck.Message
-		err = tapedeck.ReadTape(playbackFile, &messages)
+		err = tapedeck.ReadTape(config.File, &messages)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -64,14 +73,6 @@ var playbackCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(playbackCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// playbackCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// playbackCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	playbackCmd.Flags().StringVarP(&playbackFile, "file", "f", "", "The file to playback.")
+	file = playbackCmd.Flags().StringP("file", "f", "", "The file to playback.")
+	serverAddr = playbackCmd.Flags().StringP("server", "s", ":8001", "The address for the server.")
 }

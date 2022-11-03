@@ -36,7 +36,7 @@ func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 		for {
 			_, message, err := c.ReadMessage()
 			if err != nil {
-				fmt.Println(" - Rx connection Err:", output.Danger(err))
+				fmt.Println(" - Rx connection:", output.Danger(err))
 				return
 			}
 			ts := time.Since(startTime)
@@ -73,7 +73,7 @@ func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 			return *messages
 		case t := <-ticker.C:
 			// Check for duration to expire
-			if t.After(endTime) {
+			if duration != 0 && t.After(endTime) {
 				fmt.Printf("\nDuration of %v has elapsed. Shutting down...\n", output.Notice(duration))
 				gracefulShutdown()
 				return *messages
