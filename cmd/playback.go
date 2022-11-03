@@ -29,7 +29,7 @@ var playbackCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := appConfig.LoadConfig(&cfgFile)
 		if err != nil {
-			fmt.Println(err)
+			output.ErrorMsg(err)
 			os.Exit(1)
 		}
 
@@ -39,7 +39,7 @@ var playbackCmd = &cobra.Command{
 				serverAddr,
 			)
 			if err != nil {
-				fmt.Println(err)
+				output.ErrorMsg(err)
 				os.Exit(1)
 			}
 		}
@@ -49,7 +49,7 @@ var playbackCmd = &cobra.Command{
 		var messages []tapedeck.Message
 		err = tapedeck.ReadTape(config.File, &messages)
 		if err != nil {
-			fmt.Println(err)
+			output.ErrorMsg(err)
 			os.Exit(1)
 		}
 

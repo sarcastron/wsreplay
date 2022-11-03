@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -28,7 +27,7 @@ var recordCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := appConfig.LoadConfig(&cfgFile)
 		if err != nil {
-			fmt.Println(err)
+			output.ErrorMsg(err)
 			os.Exit(1)
 		}
 
@@ -39,7 +38,7 @@ var recordCmd = &cobra.Command{
 				outputFile,
 			)
 			if err != nil {
-				fmt.Println(err)
+				output.ErrorMsg(err)
 				os.Exit(1)
 			}
 		}
@@ -54,7 +53,7 @@ var recordCmd = &cobra.Command{
 		fmt.Printf("%d message(s) recorded.\n", len(messages))
 		err = tapedeck.WriteTape(config.File, &messages)
 		if err != nil {
-			log.Fatal(err)
+			output.ErrorMsg(err)
 		}
 	},
 }

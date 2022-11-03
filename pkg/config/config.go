@@ -16,6 +16,10 @@ type Config struct {
 var vp *viper.Viper
 var config Config
 
+var ErrMissingFileParam error = errors.New("missing file parameter")
+var ErrMissingTargetParam error = errors.New("missing target parameter")
+var ErrMissingServerParam error = errors.New("missing server parameter")
+
 func LoadConfig(cfgFile *string) (*Config, error) {
 	if *cfgFile == "" {
 		return nil, nil
@@ -25,10 +29,8 @@ func LoadConfig(cfgFile *string) (*Config, error) {
 
 	vp.SetConfigFile(*cfgFile)
 
-	vp.SetDefault("target", "ws://localhost:8000/")
 	vp.SetDefault("duration", 0)
-	vp.SetDefault("file", nil)
-	vp.SetDefault("ServerAddr", "localhost:8000")
+	vp.SetDefault("ServerAddr", ":8000")
 
 	err := vp.ReadInConfig()
 	if err != nil {
@@ -40,15 +42,23 @@ func LoadConfig(cfgFile *string) (*Config, error) {
 		return &Config{}, err
 	}
 
+	if config.File == "" {
+		return nil, ErrMissingFileParam
+	}
+
+	if config.Target == "" {
+		return nil, ErrMissingTargetParam
+	}
+
 	return &config, nil
 }
 
 func NewRecordConfig(target *string, duration int, file *string) (*Config, error) {
 	if *target == "" {
-		return nil, errors.New("missing target parameter")
+		return nil, ErrMissingTargetParam
 	}
 	if *file == "" {
-		return nil, errors.New("missing file parameter")
+		return nil, ErrMissingFileParam
 	}
 	config = Config{
 		Target:   *target,
@@ -60,10 +70,10 @@ func NewRecordConfig(target *string, duration int, file *string) (*Config, error
 
 func NewPlaybackConfig(file *string, serverAddr *string) (*Config, error) {
 	if *file == "" {
-		return nil, errors.New("missing file parameter")
+		return nil, ErrMissingFileParam
 	}
 	if *serverAddr == "" {
-		return nil, errors.New("missing server parameter")
+		return nil, ErrMissingServerParam
 	}
 	config = Config{
 		File:       *file,
