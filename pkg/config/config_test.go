@@ -2,7 +2,7 @@ package config
 
 import "testing"
 
-func TestNewRecordConfig(t *testing.T) {
+func Test_NewRecordConfig(t *testing.T) {
 	target := "ws://some-host:8080"
 	file := "./some/path.gob"
 	config, err := NewRecordConfig(&target, 30, &file)
@@ -21,7 +21,7 @@ func TestNewRecordConfig(t *testing.T) {
 	}
 }
 
-func TestNewRecordConfigEmptyTarget(t *testing.T) {
+func Test_NewRecordConfig_Empty_Target(t *testing.T) {
 	target := ""
 	file := "./some/path.gob"
 	config, err := NewRecordConfig(&target, 30, &file)
@@ -35,7 +35,7 @@ func TestNewRecordConfigEmptyTarget(t *testing.T) {
 	}
 }
 
-func TestNewRecordConfigEmptyFile(t *testing.T) {
+func Test_NewRecordConfig_Empty_File(t *testing.T) {
 	target := "ws://localhost:8000"
 	file := ""
 	config, err := NewRecordConfig(&target, 30, &file)
@@ -49,7 +49,7 @@ func TestNewRecordConfigEmptyFile(t *testing.T) {
 	}
 }
 
-func TestNewPlaybackConfig(t *testing.T) {
+func Test_NewPlaybackConfig(t *testing.T) {
 	addr := ":8001"
 	file := "./some/path.gob"
 	config, err := NewPlaybackConfig(&file, &addr)
@@ -65,7 +65,7 @@ func TestNewPlaybackConfig(t *testing.T) {
 	}
 }
 
-func TestNewPlaybackConfigEmptyFile(t *testing.T) {
+func Test_NewPlaybackConfig_Empty_File(t *testing.T) {
 	addr := ""
 	file := "./some/path.gob"
 	config, err := NewPlaybackConfig(&addr, &file)
@@ -79,7 +79,7 @@ func TestNewPlaybackConfigEmptyFile(t *testing.T) {
 	}
 }
 
-func TestNewPlaybackConfigEmptyAddr(t *testing.T) {
+func Test_NewPlaybackConfig_Empty_Addr(t *testing.T) {
 	addr := ":8001"
 	file := ""
 	config, err := NewPlaybackConfig(&addr, &file)

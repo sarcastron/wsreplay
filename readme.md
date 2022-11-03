@@ -67,4 +67,5 @@ For more info see the [generated docs](./docs/wsreplay.md).
 
 - Output as library for import into other projects.
 - Authentication handling.
+- Decouple UI and state
 - Interactive Mode
