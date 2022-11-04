@@ -21,7 +21,7 @@ func RandPriceMovement() float32 {
 	return min + rand.Float32()*(max-min)
 }
 
-func sendMessages() {
+func SendMessages() {
 	ticker := "AAPL"
 	u := url.URL{Scheme: "ws", Host: "localhost:8001", Path: "/", RawQuery: ""}
 	c, resp, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -49,8 +49,4 @@ func sendMessages() {
 			log.Fatalf("Failed to write JSON: %v\n", err)
 		}
 	}
-}
-
-func main() {
-	sendMessages()
 }

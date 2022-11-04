@@ -14,7 +14,7 @@ import (
 
 // TODO return an error and let the command handle the various error states
 // TODO Pass in an output channel and send messages back to decouple UI and state.
-func Record(uri string, duration time.Duration, messages *[]Message) []Message {
+func Record(uri string, duration time.Duration, messages *[]Message) {
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -30,6 +30,8 @@ func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 
 	done := make(chan struct{})
 
+	userInputChan := UserInput()
+
 	// Naming this to signal intent
 	readMessageLoop := func() {
 		// If ReadMessage() errors, close done.
@@ -43,7 +45,7 @@ func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 			ts := time.Since(startTime)
 			*messages = append(*messages, Message{ts, message})
 			i += 1
-			fmt.Printf("%v T: %v - %s", i, time.Since(startTime), message)
+			fmt.Printf(" <- %v T: %v - %s", i, time.Since(startTime), message)
 		}
 	}
 	// Throw this loop in a go routine to prevent blocking.
@@ -62,27 +64,28 @@ func Record(uri string, duration time.Duration, messages *[]Message) []Message {
 		}
 		select {
 		case <-done:
-			println("Expected done.")
 		case <-time.After(time.Second):
 		}
 	}
 
 	for {
 		select {
+		case input := <-userInputChan:
+			fmt.Println("Sending message...")
+			c.WriteMessage(websocket.TextMessage, []byte(*input))
 		case <-done:
-			fmt.Println(" - unexpected Done.")
-			return *messages
+			return
 		case t := <-ticker.C:
 			// Check for duration to expire
 			if duration != 0 && t.After(endTime) {
 				fmt.Printf("\nDuration of %v has elapsed. Shutting down...\n", output.Notice(duration))
 				gracefulShutdown()
-				return *messages
+				return
 			}
 		case <-interrupt:
 			fmt.Println(" Interrupt signal detected. Shutting down...")
 			gracefulShutdown()
-			return *messages
+			return
 		}
 	}
 }

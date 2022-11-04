@@ -1,11 +1,13 @@
 package tapedeck
 
 import (
+	"bufio"
 	"encoding/gob"
 	"errors"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Tape files are just gob files but this analogy ain't tired yet
@@ -50,4 +52,23 @@ func exists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func UserInput() chan *string {
+	inputChan := make(chan *string)
+	messageParts := []string{""}
+	go func() {
+		reader := bufio.NewReader(os.Stdin)
+		for {
+			text, _ := reader.ReadString('\n')
+			messageParts = append(messageParts, text)
+			if strings.Compare("\n", text) == 0 {
+				output := strings.Join(messageParts, "")
+				output = strings.Replace(output, "\n\n", "", 1)
+				inputChan <- &output
+				messageParts = []string{""}
+			}
+		}
+	}()
+	return inputChan
 }
