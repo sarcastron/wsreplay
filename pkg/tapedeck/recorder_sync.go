@@ -14,7 +14,7 @@ import (
 
 // TODO return an error and let the command handle the various error states
 // TODO Pass in an output channel and send messages back to decouple UI and state.
-func Record(uri string, duration time.Duration, messages *[]Message) {
+func RecordSync(uri string, duration time.Duration, messages *[]Message) {
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
