@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -50,16 +49,13 @@ var recordCmd = &cobra.Command{
 		}
 		fmt.Printf("Recording: %s%s until interrupt (%s)\n", output.Info(config.Target), timeSpan, output.Notice("ctrl-c"))
 		var messages []tapedeck.Message
-		msgBus, onComplete, errBus := tapedeck.RecordAsync(config.Target, time.Duration(config.Duration)*time.Second, &messages)
-	rtLoop:
-		for {
-			select {
-			case msg := <-msgBus:
-				fmt.Print(msg)
-			case err := <-errBus:
-				log.Println(err)
-			case <-onComplete:
-				break rtLoop
+		msgBus := tapedeck.RecordAsync(config.Target, time.Duration(config.Duration)*time.Second, &messages)
+		for msg := range msgBus {
+			if msg.Err != nil {
+				fmt.Println(msg.Err)
+			}
+			if msg.Content != nil {
+				fmt.Printf("%s", *msg.Content)
 			}
 		}
 		fmt.Printf("%s message(s) recorded.\n", output.Info(len(messages)))
