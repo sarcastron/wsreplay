@@ -74,7 +74,7 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *
 		}
 	}
 
-	ticker := time.NewTicker(time.Second * 3)
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	go func() {

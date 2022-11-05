@@ -50,3 +50,7 @@ func SendMessages() {
 		}
 	}
 }
+
+func main() {
+	SendMessages()
+}
