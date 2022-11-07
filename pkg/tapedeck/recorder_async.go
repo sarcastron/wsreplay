@@ -75,9 +75,10 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *
 	}
 
 	ticker := time.NewTicker(time.Second)
-	defer ticker.Stop()
-
 	go func() {
+		defer ticker.Stop()
+		defer close(msgBus)
+		defer c.Close()
 	recordLoop:
 		for {
 			select {
@@ -85,7 +86,6 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *
 				// Connection was closed unexpectedly. break the loop
 				break recordLoop
 			case input := <-userInputChan:
-				fmt.Println("Sending message...")
 				err := c.WriteMessage(websocket.TextMessage, []byte(*input))
 				if err != nil {
 					msgBus <- newError(err)
@@ -94,7 +94,7 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *
 				if duration != 0 && t.After(endTime) {
 					msgBus <- newMessage(fmt.Sprintf("\nDuration of %v has elapsed. Shutting down...\n", output.Notice(duration)))
 					gracefulShutdown()
-					return
+					break recordLoop
 				}
 			case <-interrupt:
 				msgBus <- newMessage(" Interrupt signal detected. Shutting down...\n")
@@ -102,8 +102,6 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *
 				break recordLoop
 			}
 		}
-		c.Close()
-		close(msgBus)
 	}()
 
 	return msgBus
