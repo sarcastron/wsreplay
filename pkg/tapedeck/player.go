@@ -33,25 +33,7 @@ func Playback(messages *[]Message, wsConn *websocket.Conn) error {
 	total := len(*messages)
 	i := 0
 
-	spinnerSet := []rune("⣾⣷⣯⣟⡿⢿⣻⣽")
-	spinnerIndex := 0
-	go func() {
-		ticker := time.NewTicker(time.Millisecond * 100)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-done:
-				ticker.Stop()
-				return
-			case <-ticker.C:
-				if spinnerIndex >= len(spinnerSet)-1 {
-					spinnerIndex = 0
-				} else {
-					spinnerIndex += 1
-				}
-			}
-		}
-	}()
+	output.MeterSpinner.Spin()
 
 	for {
 		select {
@@ -61,7 +43,7 @@ func Playback(messages *[]Message, wsConn *websocket.Conn) error {
 		case <-time.After(time.Millisecond / 2):
 			// Check for duration to expire
 			ts := time.Since(startTime)
-			fmt.Printf("  %s %s          \r", output.Info(string(spinnerSet[spinnerIndex])), ts)
+			fmt.Printf("  %s %s          \r", output.Info(output.MeterSpinner.Render()), ts)
 			if ts >= (*messages)[i].Tick {
 				fmt.Printf("#%d - %s                 \n", i+1, strings.TrimSuffix(string((*messages)[i].Content), "\n"))
 				// TODO Allow recording binary ws messages as well.
