@@ -11,20 +11,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type RecorderMessage struct {
-	Content *string
-	Err     error
-}
-
-func newMessage(msg string) *RecorderMessage {
-	return &RecorderMessage{&msg, nil}
-}
-func newError(err error) *RecorderMessage {
-	return &RecorderMessage{nil, err}
-}
-
-func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *RecorderMessage {
-	msgBus := make(chan *RecorderMessage)
+func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan BusMessager {
+	msgBus := make(chan BusMessager)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -49,13 +37,13 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				// exits the loop if connection is killed from outside and inside.
-				msgBus <- newError(fmt.Errorf(" - Rx: %s", output.Danger(err)))
+				msgBus <- &BusMessageErr{"Rx:", err, false}
 				return
 			}
 			ts := time.Since(startTime)
 			*messages = append(*messages, Message{ts, message})
 			i += 1
-			msgBus <- newMessage(fmt.Sprintf(" <- %v T: %v - %s", output.Notice(i), time.Since(startTime), message))
+			msgBus <- &BusMessageInfo{fmt.Sprint(i), fmt.Sprintf("T: %v - %s", time.Since(startTime), message)}
 		}
 	}()
 
@@ -70,7 +58,7 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *
 		select {
 		case <-done:
 		case <-time.After(time.Second):
-			msgBus <- newMessage("Closing after time out.")
+			msgBus <- &BusMessageInfo{"", "Closing after time out."}
 		}
 	}
 
@@ -88,16 +76,18 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan *
 			case input := <-userInputChan:
 				err := c.WriteMessage(websocket.TextMessage, []byte(*input))
 				if err != nil {
-					msgBus <- newError(err)
+					// msgBus <- newError(err)
+					msgBus <- &BusMessageErr{"Tx:", err, false}
 				}
 			case t := <-ticker.C:
 				if duration != 0 && t.After(endTime) {
-					msgBus <- newMessage(fmt.Sprintf("\nDuration of %v has elapsed. Shutting down...\n", output.Notice(duration)))
+					// msgBus <- newMessage(fmt.Sprintf("\nDuration of %v has elapsed. Shutting down...\n", output.Notice(duration)))
+					msgBus <- &BusMessageInfo{"", fmt.Sprintf("\nDuration of %s has elapsed. Shutting down...\n", duration)}
 					gracefulShutdown()
 					break recordLoop
 				}
 			case <-interrupt:
-				msgBus <- newMessage(" Interrupt signal detected. Shutting down...\n")
+				msgBus <- &BusMessageInfo{"", "Interrupt signal (ctrl-c) detected. Shutting down..."}
 				gracefulShutdown()
 				break recordLoop
 			}

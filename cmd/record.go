@@ -51,11 +51,17 @@ var recordCmd = &cobra.Command{
 		var messages []tapedeck.Message
 		msgBus := tapedeck.RecordAsync(config.Target, time.Duration(config.Duration)*time.Second, &messages)
 		for msg := range msgBus {
-			if msg.Err != nil {
-				fmt.Println(msg.Err)
-			}
-			if msg.Content != nil {
-				fmt.Printf("%s", *msg.Content)
+			fmt.Println("Got a message", msg)
+			switch bm := msg.(type) {
+			case *tapedeck.BusMessageInfo:
+				fmt.Print(msg.CliMessage())
+			case *tapedeck.BusMessageErr:
+				if bm.IsFatal {
+					fmt.Println(bm.CliMessage())
+					os.Exit(1)
+				} else {
+					fmt.Println(bm.CliMessage())
+				}
 			}
 		}
 		fmt.Printf("%s message(s) recorded.\n", output.Info(len(messages)))
