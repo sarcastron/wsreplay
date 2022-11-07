@@ -25,6 +25,9 @@ var recordCmd = &cobra.Command{
 	Short: "Record a websocket session.",
 	Long:  `Records a websocket session and saves the session to a serialized gob file.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if cmd.Flags().Changed("quiet") {
+			quiet = true
+		}
 		config, err := appConfig.LoadConfig(&cfgFile)
 		if err != nil {
 			output.ErrorMsg(err)
@@ -47,14 +50,16 @@ var recordCmd = &cobra.Command{
 		if *duration > 0 {
 			timeSpan = fmt.Sprintf(" for %s seconds or", output.Info(config.Duration))
 		}
+
 		fmt.Printf("Recording: %s%s until interrupt (%s)\n", output.Info(config.Target), timeSpan, output.Notice("ctrl-c"))
 		var messages []tapedeck.Message
 		msgBus := tapedeck.RecordAsync(config.Target, time.Duration(config.Duration)*time.Second, &messages)
 		for msg := range msgBus {
-			fmt.Println("Got a message", msg)
 			switch bm := msg.(type) {
 			case *tapedeck.BusMessageInfo:
-				fmt.Print(msg.CliMessage())
+				if !quiet {
+					fmt.Print(msg.CliMessage())
+				}
 			case *tapedeck.BusMessageErr:
 				if bm.IsFatal {
 					fmt.Println(bm.CliMessage())
