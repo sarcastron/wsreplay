@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func Playback(messages *[]Message, wsConn *websocket.Conn) error {
+func PlaybackSync(messages *[]Message, wsConn *websocket.Conn) error {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 

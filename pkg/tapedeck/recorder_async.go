@@ -17,7 +17,7 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan B
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	// This will be closed on websocket read error or close
+	// This will be closed on websocket read error or when recordLoop is broken
 	done := make(chan interface{})
 
 	startTime := time.Now()
@@ -76,12 +76,10 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan B
 			case input := <-userInputChan:
 				err := c.WriteMessage(websocket.TextMessage, []byte(*input))
 				if err != nil {
-					// msgBus <- newError(err)
 					msgBus <- &BusMessageErr{"Tx:", err, false}
 				}
 			case t := <-ticker.C:
 				if duration != 0 && t.After(endTime) {
-					// msgBus <- newMessage(fmt.Sprintf("\nDuration of %v has elapsed. Shutting down...\n", output.Notice(duration)))
 					msgBus <- &BusMessageInfo{"", fmt.Sprintf("\nDuration of %s has elapsed. Shutting down...\n", duration)}
 					gracefulShutdown()
 					break recordLoop

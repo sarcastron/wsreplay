@@ -66,7 +66,26 @@ var playbackCmd = &cobra.Command{
 		wsConn := <-wsChan
 		defer wsConn.Close()
 		fmt.Println("connected.")
-		tapedeck.Playback(&messages, wsConn)
+		msgBus := tapedeck.PlaybackAsync(&messages, wsConn)
+		for msg := range msgBus {
+			switch bm := msg.(type) {
+			case *tapedeck.PlaybackPrompt:
+				fmt.Print(msg.CliMessage())
+			case *tapedeck.BusMessageInfo:
+				if !quiet {
+					fmt.Print(msg.CliMessage() + "                 \n")
+				}
+			case *tapedeck.BusMessageErr:
+				if bm.IsFatal {
+					fmt.Println(bm.CliMessageln())
+					os.Exit(1)
+				} else {
+					fmt.Println(bm.CliMessageln())
+				}
+			}
+		}
+		fmt.Println("------------------------------------------")
+		fmt.Printf("%s Messages replayed.\n", output.Info(len(messages)))
 	},
 }
 

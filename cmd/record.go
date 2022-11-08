@@ -58,7 +58,7 @@ var recordCmd = &cobra.Command{
 			switch bm := msg.(type) {
 			case *tapedeck.BusMessageInfo:
 				if !quiet {
-					fmt.Print(msg.CliMessage())
+					fmt.Print(msg.CliMessageln())
 				}
 			case *tapedeck.BusMessageErr:
 				if bm.IsFatal {

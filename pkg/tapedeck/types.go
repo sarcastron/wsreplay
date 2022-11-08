@@ -17,6 +17,22 @@ type Message struct {
 type BusMessager interface {
 	// Function that outputs a message formatted for the CLI
 	CliMessage() string
+	CliMessageln() string
+}
+
+type PlaybackPrompt struct {
+	spinner  string
+	duration time.Duration
+}
+
+// Generate string for CLI output
+func (p *PlaybackPrompt) CliMessage() string {
+	return fmt.Sprintf("  %s %s          \r", output.Info(p.spinner), p.duration)
+}
+
+// Generate string for CLI output with new line char at the end.
+func (p *PlaybackPrompt) CliMessageln() string {
+	return p.CliMessage() + "\n"
 }
 
 // Represents a successful or informational event.
@@ -31,7 +47,12 @@ func (bm *BusMessageInfo) CliMessage() string {
 	if bm.Prefix != "" {
 		fPrefix = fmt.Sprintf("%s ", output.Info(bm.Prefix))
 	}
-	return fmt.Sprintf("%s%s\n", fPrefix, strings.TrimSuffix(bm.Content, "\n"))
+	return fmt.Sprintf("%s%s", fPrefix, strings.TrimSuffix(bm.Content, "\n"))
+}
+
+// Generate string for CLI output with new line char at the end.
+func (bm *BusMessageInfo) CliMessageln() string {
+	return bm.CliMessage() + "\n"
 }
 
 // Represents an error event.
@@ -48,4 +69,9 @@ func (bm *BusMessageErr) CliMessage() string {
 		fPrefix = fmt.Sprintf("%s ", output.Danger(bm.Prefix))
 	}
 	return fmt.Sprintf("%s%s", fPrefix, bm.Err)
+}
+
+// Generate string for CLI output with new line char at the end.
+func (bm *BusMessageErr) CliMessageln() string {
+	return bm.CliMessage() + "\n"
 }
