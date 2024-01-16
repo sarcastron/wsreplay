@@ -31,7 +31,6 @@ func StartServer(addr string, wsChan chan *websocket.Conn) {
 		}
 		ws.SetPongHandler(func(string) error {
 			log.Println("Got the pong")
-			// user.Socket.SetReadDeadline(t)
 			ws.SetReadDeadline(time.Now().Add(pongWait))
 			return nil
 		})
