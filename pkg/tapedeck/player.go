@@ -35,6 +35,8 @@ func PlaybackAsync(messages *[]Message, wsConn *websocket.Conn) chan BusMessager
 					err := wsConn.WriteMessage(websocket.TextMessage, (*messages)[i].Content)
 					if err != nil {
 						msgBus <- &BusMessageErr{"Tx :", err, false}
+						fmt.Println(" Connection error. Shutting down...")
+						break playbackLoop
 					}
 					i += 1
 					if i >= total {

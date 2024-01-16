@@ -27,6 +27,9 @@ var playbackCmd = &cobra.Command{
 	Short: "Playback a recorded websocket session.",
 	Long:  `Will playback a recorded session. Playback will start as soon as the client connects to it.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if cmd.Flags().Changed("quiet") {
+			quiet = true
+		}
 		config, err := appConfig.LoadConfig(&cfgFile)
 		if err != nil {
 			output.ErrorMsg(err)
