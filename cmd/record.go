@@ -53,7 +53,7 @@ var recordCmd = &cobra.Command{
 
 		fmt.Printf("Recording: %s%s until interrupt (%s)\n", output.Info(config.Target), timeSpan, output.Notice("ctrl-c"))
 		var messages []tapedeck.Message
-		msgBus := tapedeck.RecordAsync(config.Target, time.Duration(config.Duration)*time.Second, &messages)
+		msgBus := tapedeck.RecordAsync(config.Target, time.Duration(config.Duration)*time.Second, &messages, config.SendMessages)
 		for msg := range msgBus {
 			switch bm := msg.(type) {
 			case *tapedeck.BusMessageInfo:

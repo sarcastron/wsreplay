@@ -12,6 +12,12 @@ target: ws://localhost:8080
 # duration in seconds
 duration: 300
 file: './tapes/session_20221031.gob'
+# optional messages to send and when to send them in seconds
+sendMessages:
+  - at: 0.8 # Send this message 0.8 seconds after connection
+    message: '{"action":"auth","params":"S0m3_4uth_T0k3n"}'
+  - at: 1.2 # Send this message 1.2 seconds after connection
+    message: '{"action":"subscribe","topic":"howBoutThemIggles"}'
 # Playback setting
 serverAddr: '0.0.0.0:8001'
 ```

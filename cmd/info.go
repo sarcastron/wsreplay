@@ -13,6 +13,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func firstN(s string, n int) string {
+	i := 0
+	for j := range s {
+		if i == n {
+			return s[:j]
+		}
+		i++
+	}
+	return s
+}
+
 // infoCmd represents the info command
 var infoCmd = &cobra.Command{
 	Use:   "info",
@@ -33,6 +44,14 @@ var infoCmd = &cobra.Command{
 		fmt.Printf(" - Target: %s\n", output.Info(config.Target))
 		fmt.Printf(" - Duration: %s\n", output.Info(config.Duration))
 		fmt.Printf(" - Output File: %s\n", output.Info(config.File))
+		if len(config.SendMessages) > 0 {
+			fmt.Print(" - Send Messages:\n")
+			for _, sm := range config.SendMessages {
+				fmt.Printf("   - At %s seconds - %s...\n", output.Info(sm.At), output.Info(firstN(sm.Message, 20)))
+			}
+		} else {
+			fmt.Printf(" - Send Messages: %s\n", output.Info("none"))
+		}
 
 		fmt.Print("\nPlayback settings\n")
 		fmt.Printf(" - Input File: %s\n", output.Info(config.File))

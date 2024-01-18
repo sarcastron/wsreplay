@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/spf13/cobra"
@@ -87,6 +88,8 @@ var playbackCmd = &cobra.Command{
 				}
 			}
 		}
+		wsConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+		time.Sleep(10 * time.Second)
 		fmt.Println("------------------------------------------")
 		fmt.Printf("%s Messages replayed.\n", output.Info(len(messages)))
 	},

@@ -6,11 +6,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+type SendMessage struct {
+	At      float32 `mapstructure:"at"`
+	Message string  `mapstructure:"message"`
+}
+
 type Config struct {
-	Target     string `mapstructure:"target"`
-	Duration   int    `mapstructure:"duration"`
-	File       string `mapstructure:"file"`
-	ServerAddr string `mapstructure:"serverAddr"`
+	Target       string        `mapstructure:"target"`
+	Duration     int           `mapstructure:"duration"`
+	File         string        `mapstructure:"file"`
+	ServerAddr   string        `mapstructure:"serverAddr"`
+	SendMessages []SendMessage `mapstructure:"sendMessages"`
 }
 
 var vp *viper.Viper
@@ -61,9 +67,10 @@ func NewRecordConfig(target *string, duration int, file *string) (*Config, error
 		return nil, ErrMissingFileParam
 	}
 	config = Config{
-		Target:   *target,
-		Duration: duration,
-		File:     *file,
+		Target:       *target,
+		Duration:     duration,
+		File:         *file,
+		SendMessages: []SendMessage{},
 	}
 	return &config, nil
 }

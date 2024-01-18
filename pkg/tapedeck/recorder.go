@@ -6,12 +6,18 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"wsreplay/pkg/config"
 	"wsreplay/pkg/output"
 
 	"github.com/gorilla/websocket"
 )
 
-func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan BusMessager {
+type SendableMessage struct {
+	At      time.Time
+	Message string
+}
+
+func RecordAsync(uri string, duration time.Duration, messages *[]Message, sendMessages []config.SendMessage) chan BusMessager {
 	msgBus := make(chan BusMessager)
 
 	interrupt := make(chan os.Signal, 1)
@@ -41,6 +47,7 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan B
 				return
 			}
 			ts := time.Since(startTime)
+			// Append to messages slice
 			*messages = append(*messages, Message{ts, message})
 			i += 1
 			msgBus <- &BusMessageInfo{fmt.Sprint(i), fmt.Sprintf("T: %v - %s", time.Since(startTime), message)}
@@ -62,7 +69,20 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan B
 		}
 	}
 
-	ticker := time.NewTicker(time.Second)
+	// Convert sendMessages to SendableMessage slice to be used for timed TX messages
+	messagesWithTime := make([]SendableMessage, len(sendMessages))
+	if len(sendMessages) > 0 {
+		// messagesWithTime = make([]SendableMessage, len(sendMessages))
+		for i, sm := range sendMessages {
+			messagesWithTime[i] = SendableMessage{startTime.Add(time.Duration(sm.At * float32(time.Second))), sm.Message}
+		}
+	}
+	var nextMessageIdx int = -1
+	if len(messagesWithTime) > 0 {
+		nextMessageIdx = 0
+	}
+
+	ticker := time.NewTicker(200 * time.Millisecond)
 	go func() {
 		defer ticker.Stop()
 		defer close(msgBus)
@@ -79,6 +99,21 @@ func RecordAsync(uri string, duration time.Duration, messages *[]Message) chan B
 					msgBus <- &BusMessageErr{"Tx:", err, false}
 				}
 			case t := <-ticker.C:
+				// check that there are messages to send and that the time has elapsed
+				if nextMessageIdx != -1 && t.After(messagesWithTime[nextMessageIdx].At) {
+					err := c.WriteMessage(websocket.TextMessage, []byte(messagesWithTime[nextMessageIdx].Message))
+					if err != nil {
+						msgBus <- &BusMessageErr{"Tx:", err, false}
+					} else {
+						msgBus <- &BusMessageInfo{"Tx", fmt.Sprintf("%s\n", messagesWithTime[nextMessageIdx].Message)}
+					}
+					// Set the next message index
+					if nextMessageIdx < len(messagesWithTime)-1 {
+						nextMessageIdx += 1
+					} else {
+						nextMessageIdx = -1
+					}
+				}
 				if duration != 0 && t.After(endTime) {
 					msgBus <- &BusMessageInfo{"", fmt.Sprintf("\nDuration of %s has elapsed. Shutting down...\n", duration)}
 					gracefulShutdown()
